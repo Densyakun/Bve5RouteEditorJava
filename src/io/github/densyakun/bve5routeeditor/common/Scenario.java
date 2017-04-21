@@ -30,7 +30,7 @@ public class Scenario implements Serializable {
 	public static final String VERSION = "2.00";
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 	public static final String HEADER = "BveTs Scenario " + VERSION;
-	public static final String HEADER_BVE5RE = "# Edited by BVE5RouteEditor.";
+	public static final String HEADER_BVE5RE = "##### Edited by BVE5RouteEditor. #####";
 	public static final String KEY_ROUTE = "Route";
 	public static final String KEY_VEHICLE = "Vehicle";
 	public static final String KEY_TITLE = "Title";
@@ -43,8 +43,8 @@ public class Scenario implements Serializable {
 
 	//Charset cs;
 
-	HashMap<String, Double> routes = new HashMap<String, Double>();
-	HashMap<String, Double> vehicles = new HashMap<String, Double>();
+	HashMap<File, Double> routes = new HashMap<File, Double>();
+	HashMap<File, Double> vehicles = new HashMap<File, Double>();
 	String title;
 	String image;
 	String routeTitle;
@@ -73,28 +73,28 @@ public class Scenario implements Serializable {
 	}*/
 
 	/**
-	 * マップファイルの相対パスと重み係数を取得します。
-	 * @return マップファイル相対パス
+	 * マップファイルと重み係数を取得します。
+	 * @return マップファイル(キー)と重み係数(値)
 	 */
-	public HashMap<String, Double> getRoutes() {
+	public HashMap<File, Double> getRoutes() {
 		return routes;
 	}
 
 	/**
-	 * マップファイルの相対パスと重み係数を設定します。重み係数が大きいほど、そのファイルが選ばれる確率が高くなります。
-	 * @param routes マップファイル相対パス
+	 * マップファイルと重み係数を設定します。重み係数が大きいほど、そのファイルが選ばれる確率が高くなります。
+	 * @param routes マップファイル(キー)と重み係数(値)
 	 */
-	public void setRoutes(HashMap<String, Double> routes) {
+	public void setRoutes(HashMap<File, Double> routes) {
 		this.routes = routes;
 	}
 
 	/**
 	 * シナリオ開始時に選ばれる 1 つのマップファイルがランダムに選ばれます。
-	 * @return マップファイル相対パス(マップファイルが無い場合はnull)
+	 * @return マップファイル(マップファイルが無い場合はnull)
 	 */
-	public String getRandomRoute() {
+	public File getRandomRoute() {
 		double a = 0.0;
-		String[] keys = routes.keySet().toArray(new String[0]);
+		File[] keys = routes.keySet().toArray(new File[0]);
 		for (int b = 0; b < keys.length; b++) {
 			a += routes.get(keys[b]);
 		}
@@ -110,28 +110,28 @@ public class Scenario implements Serializable {
 	}
 
 	/**
-	 * 車両ファイルの相対パスと重み係数を取得します。
-	 * @return 車両ファイル相対パス
+	 * 車両ファイルと重み係数を取得します。
+	 * @return 車両ファイル(キー)と重み係数(値)
 	 */
-	public HashMap<String, Double> getVehicles() {
+	public HashMap<File, Double> getVehicles() {
 		return vehicles;
 	}
 
 	/**
-	 * 車両ファイルの相対パスと重み係数を設定します。重み係数が大きいほど、そのファイルが選ばれる確率が高くなります。
-	 * @param vehicles 車両ファイル相対パス
+	 * 車両ファイルと重み係数を設定します。重み係数が大きいほど、そのファイルが選ばれる確率が高くなります。
+	 * @param vehicles 車両ファイル(キー)と重み係数(値)
 	 */
-	public void setVehicles(HashMap<String, Double> vehicles) {
+	public void setVehicles(HashMap<File, Double> vehicles) {
 		this.vehicles = vehicles;
 	}
 
 	/**
 	 * シナリオ開始時に選ばれる 1 つの車両ファイルがランダムに選ばれます。
-	 * @return 車両ファイル相対パス(車両ファイルが無い場合はnull)
+	 * @return 車両ファイル(車両ファイルが無い場合はnull)
 	 */
-	public String getRandomVehicle() {
+	public File getRandomVehicle() {
 		double a = 0.0;
-		String[] keys = vehicles.keySet().toArray(new String[0]);
+		File[] keys = vehicles.keySet().toArray(new File[0]);
 		for (int b = 0; b < keys.length; b++) {
 			a += vehicles.get(keys[b]);
 		}
@@ -281,6 +281,10 @@ public class Scenario implements Serializable {
 	 * @throws IOException 入出力エラーが発生した場合
 	 */
 	public static Scenario read(File file) throws IOException {
+		//ファイルが読み込み可能か、使用可能なバージョンかは確認していない。
+
+
+
 		Charset cs = DEFAULT_CHARSET;
 
 		FileInputStream fis = new FileInputStream(file);
@@ -306,8 +310,8 @@ public class Scenario implements Serializable {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), cs));
 
 		Scenario scenario = new Scenario();
-		HashMap<String, Double> routes = new HashMap<String, Double>();
-		HashMap<String, Double> vehicles = new HashMap<String, Double>();
+		HashMap<File, Double> routes = new HashMap<File, Double>();
+		HashMap<File, Double> vehicles = new HashMap<File, Double>();
 		String commentout = "";
 
 
@@ -350,7 +354,7 @@ public class Scenario implements Serializable {
 						int c = str.indexOf('=', KEY_ROUTE.length());
 						if (c != -1) {
 							String[] d = str.substring(c + 1).split("[*|]");
-							String e = null;
+							File e = null;
 							for (int f = 0; f < d.length; f++) {
 								try {
 									double g = Double.valueOf(d[f].trim());
@@ -360,9 +364,7 @@ public class Scenario implements Serializable {
 										routes.put(e, g);
 									}
 								} catch (NumberFormatException x) {
-									if ((e = d[f].trim()) != null) {
-										routes.put(e, 1.0);
-									}
+									routes.put(e = new File(file.getParent(), d[f].trim()), 1.0);
 								}
 							}
 						}
@@ -370,7 +372,7 @@ public class Scenario implements Serializable {
 						int c = str.indexOf('=', KEY_VEHICLE.length());
 						if (c != -1) {
 							String[] d = str.substring(c + 1).split("[*|]");
-							String e = null;
+							File e = null;
 							for (int f = 0; f < d.length; f++) {
 								try {
 									double g = Double.valueOf(d[f].trim());
@@ -380,9 +382,7 @@ public class Scenario implements Serializable {
 										vehicles.put(e, g);
 									}
 								} catch (NumberFormatException x) {
-									if ((e = d[f].trim()) != null) {
-										vehicles.put(e, 1.0);
-									}
+									vehicles.put(e = new File(file.getParent(), d[f].trim()), 1.0);
 								}
 							}
 						}
@@ -447,13 +447,13 @@ public class Scenario implements Serializable {
 		pw.println(HEADER_BVE5RE);
 
 		String a = KEY_ROUTE + " = ";
-		String[] keys = scenario.getRoutes().keySet().toArray(new String[0]);
-		for (int b = 0; b < keys.length; b++) {
+		File[] filekeys = scenario.getRoutes().keySet().toArray(new File[0]);
+		for (int b = 0; b < filekeys.length; b++) {
 			if (b != 0) {
 				a += " | ";
 			}
-			a += keys[b];
-			double c = scenario.getRoutes().get(keys[b]);
+			a += file.getParentFile().toPath().relativize(filekeys[b].toPath());
+			double c = scenario.getRoutes().get(filekeys[b]);
 			if (c != 1.0) {
 				a += " * " + c;
 			}
@@ -461,13 +461,13 @@ public class Scenario implements Serializable {
 		pw.println(a);
 
 		a = KEY_VEHICLE + " = ";
-		keys = scenario.getVehicles().keySet().toArray(new String[0]);
-		for (int b = 0; b < keys.length; b++) {
+		filekeys = scenario.getVehicles().keySet().toArray(new File[0]);
+		for (int b = 0; b < filekeys.length; b++) {
 			if (b != 0) {
 				a += " | ";
 			}
-			a += keys[b];
-			double c = scenario.getVehicles().get(keys[b]);
+			a += file.getParentFile().toPath().relativize(filekeys[b].toPath());
+			double c = scenario.getVehicles().get(filekeys[b]);
 			if (c != 1.0) {
 				a += " * " + c;
 			}

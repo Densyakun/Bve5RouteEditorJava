@@ -32,8 +32,8 @@ public class Client {
 			try {
 				scenario = Scenario.read(filechooser.getSelectedFile());
 
-				System.out.println("Route: " + scenario.getRandomRoute());
-				System.out.println("Vehicle: " + scenario.getRandomVehicle());
+				System.out.println("RoutePath(Random): " + scenario.getRandomRoute());
+				System.out.println("VehiclePath(Random): " + scenario.getRandomVehicle());
 				System.out.println("Title: " + scenario.getTitle());
 				System.out.println("Image: " + scenario.getImage());
 				System.out.println("RouteTitle: " + scenario.getRouteTitle());
