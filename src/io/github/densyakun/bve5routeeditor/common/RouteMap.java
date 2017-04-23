@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -30,33 +31,28 @@ public class RouteMap implements Serializable {
 	 */
 	public static final String VERSION = "2.02";
 	public static final String HEADER = "BveTs Map " + VERSION;
-	public static final String[] _COMMENT_PREFIX = new String[]{"#", "//"};
 	public static final String SUFFIX = ";";
+	public static final String[] _COMMENT_PREFIX = new String[]{"#", "//"};
 
-	//File mapfile;
-	//boolean loaded = false;
-	HashMap<Double, String> commentout = new HashMap<Double, String>();
-	String comment_prefix = _COMMENT_PREFIX[0];
-
-	/*public RouteMap(File mapfile) {
-		setMapfile(mapfile);
-	}*/
+	private HashMap<Double, ArrayList<RouteMapStatement>> statements = new HashMap<Double, ArrayList<RouteMapStatement>>();
+	private HashMap<Double, String> commentout = new HashMap<Double, String>();
+	private String comment_prefix = _COMMENT_PREFIX[0];
 
 	/**
-	 * マップファイルを取得します。
-	 * @return マップファイル
+	 * ステートメントを取得します。
+	 * @return 距離程(キー)とステートメント(値)
 	 */
-	/*public File getMapfile() {
-		return mapfile;
-	}*/
+	public HashMap<Double, ArrayList<RouteMapStatement>> getStatements() {
+		return statements;
+	}
 
 	/**
-	 * マップファイルを設定します。
-	 * @param mapfile マップファイル
+	 * ステートメントを設定します。
+	 * @param statements 距離程(キー)とステートメント(値)
 	 */
-	/*public void setMapfile(File mapfile) {
-		this.mapfile = mapfile;
-	}*/
+	public void setStatements(HashMap<Double, ArrayList<RouteMapStatement>> statements) {
+		this.statements = statements;
+	}
 
 	/**
 	 * マップファイル読み込み時に確認されたすべてのコメントアウト文字列を取得します。
@@ -125,10 +121,8 @@ public class RouteMap implements Serializable {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), cs));
 
-		//RouteMap routemap = new RouteMap(file);
 		RouteMap routemap = new RouteMap();//TODO map
-		//HashMap<RouteMap, Double> routes = new HashMap<RouteMap, Double>();
-		//HashMap<File, Double> vehicles = new HashMap<File, Double>();
+		HashMap<Double, ArrayList<RouteMapStatement>> statements = new HashMap<Double, ArrayList<RouteMapStatement>>();
 		HashMap<Double, String> commentout = new HashMap<Double, String>();
 
 
@@ -139,6 +133,7 @@ public class RouteMap implements Serializable {
 		}
 
 		double distance = 0.0;//TODO
+		String statement = "";
 
 		String str;
 		for (int b = 0; (str = br.readLine()) != null; b++) {
@@ -162,74 +157,89 @@ public class RouteMap implements Serializable {
 				if (b != 0) {
 					String[] z = str.split(SUFFIX);//TODO c
 					for (int d = 0; d < z.length; d++) {
-						z[d] = z[d].trim();
+						statement += z[d].trim();
 						try {
-							distance = Double.valueOf(z[d]);
+							distance = Double.valueOf(statement);
 						} catch (NumberFormatException e) {
-
-
-
-							/*if (str.startsWith(KEY_ROUTE_TITLE)) {
-								int c = str.indexOf('=', KEY_ROUTE_TITLE.length());
-								if (c != -1) {
-									routemap.setRouteTitle(str.substring(c + 1).trim());
-								}
-							} else if (str.startsWith(KEY_VEHICLE_TITLE)) {
-								int c = str.indexOf('=', KEY_VEHICLE_TITLE.length());
-								if (c != -1) {
-									routemap.setVehicleTitle(str.substring(c + 1).trim());
-								}
-							} else if (str.startsWith(KEY_ROUTE)) {
-								int c = str.indexOf('=', KEY_ROUTE.length());
-								if (c != -1) {
-									String[] d = str.substring(c + 1).split("[*|]");
-									RouteMap e = null;
-									for (int f = 0; f < d.length; f++) {
-										try {
-											double g = Double.valueOf(d[f].trim());
-											if (e == null) {
-												System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
-											} else {
-												routes.put(e, g);
-											}
-										} catch (NumberFormatException x) {
-											(e = new RouteMap()).setMapfile(new File(file.getParent(), d[f].trim()));
-											routes.put(e, 1.0);
+							if (!statement.isEmpty()) {
+								int f = statement.indexOf('(');
+								int g = statement.indexOf(')');
+								if (f != -1 && g != -1) {
+									String[] h = statement.substring(0, f).split("\\.");
+									if (2 <= h.length && h.length <= 3) {
+										int i = statement.indexOf('[');
+										int j = statement.indexOf(']');
+										String k = h[0];
+										if (i != -1) {
+											k = k.substring(0, i);
 										}
-									}
-								}
-							} else if (str.startsWith(KEY_VEHICLE)) {
-								int c = str.indexOf('=', KEY_VEHICLE.length());
-								if (c != -1) {
-									String[] d = str.substring(c + 1).split("[*|]");
-									File e = null;
-									for (int f = 0; f < d.length; f++) {
-										try {
-											double g = Double.valueOf(d[f].trim());
-											if (e == null) {
-												System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
-											} else {
-												vehicles.put(e, g);
+										boolean l = true;
+										RouteMapElement[] m = RouteMapElement.values();
+										for (int n = 0; n < m.length; n++) {
+											if (m[n].name().equalsIgnoreCase(k)) {
+												l = false;
+												String[] o = statement.substring(f + 1, g).split(",");
+												Object[] p = new Object[o.length];
+												for (int q = 0; q < o.length; q++) {
+													String r = o[q].trim();
+													if (r.isEmpty()) {
+														p[q] = null;
+													} else if (r.startsWith("'") && r.endsWith("'")) {//TODO "
+														p[q] = r.substring(1, r.length() - 1);
+													} else {
+														try {
+															p[q] = Integer.valueOf(r);
+														} catch (NumberFormatException x) {
+															try {
+																p[q] = Double.valueOf(r);
+															} catch (NumberFormatException ex) {
+																System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+															}
+														}
+													}
+												}
+												boolean q = true;
+												String[] r = RouteMapElement.getFunctions(m[n]);
+												for (int s = 0; s < r.length; s++) {
+													if (r[s].equalsIgnoreCase(h[h.length - 1])) {
+														q = false;
+														RouteMapStatement t = new RouteMapStatement(m[n], r[s], p);
+														if (i != -1 && j != -1) {
+															String u = statement.substring(i + 1, j);
+															if (u.startsWith("'") && u.endsWith("'")) {//TODO "
+																t.setElement_key(u.substring(1, u.length() - 1));
+															}
+														}
+														if (2 < h.length) {
+															t.setElement2(RouteMapElement.valueOf(h[1]));
+														}
+														ArrayList<RouteMapStatement> v = statements.get(distance);
+														if (v == null) {
+															v = new ArrayList<RouteMapStatement>();
+														}
+														v.add(t);
+														statements.put(distance, v);
+														break;
+													}
+												}
+												if (q) {
+													System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+												}
+												break;
 											}
-										} catch (NumberFormatException x) {
-											vehicles.put(e = new File(file.getParent(), d[f].trim()), 1.0);
 										}
+										if (l) {
+											System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+										}
+									} else {
+										System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 									}
+								} else {
+									System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 								}
-							} else if (str.startsWith(KEY_TITLE)) {
-								int c = str.indexOf('=', KEY_TITLE.length());
-								if (c != -1) {
-									routemap.setTitle(str.substring(c + 1).trim());
-								}
-							} else if (str.startsWith(KEY_COMMENT)) {
-								int c = str.indexOf('=', KEY_COMMENT.length());
-								if (c != -1) {
-									routemap.setComment(str.substring(c + 1).trim());
-								}
-							} else */if (!z[d].isEmpty()) {
-								System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 							}
 						}
+						statement = "";
 					}
 				}
 			}
@@ -244,8 +254,7 @@ public class RouteMap implements Serializable {
 		}
 		routemap.setComment_prefix(_COMMENT_PREFIX[b]);
 
-		//routemap.setRoutes(routes);
-		//routemap.setVehicles(vehicles);
+		routemap.setStatements(statements);
 		routemap.setCommentOut(commentout);
 		return routemap;
 	}

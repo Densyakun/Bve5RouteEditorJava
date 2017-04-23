@@ -12,6 +12,7 @@ public class MySketch extends PApplet {
 	boolean stopping = false;
 	float rx = 0f;
 	float ry = 0f;
+	float min_distance = 0.0f;
 
 	public MySketch() {
 		Client._3d_view = this;
@@ -31,33 +32,60 @@ public class MySketch extends PApplet {
 
 		background(bg.getRed(), bg.getGreen(), bg.getBlue());
 
-		rect(24, 96, 24, 96);
+		//rect(24, 96, 24, 96);
 
+		lights();
+		//translate(width / 2, height / 2, -100);
 		translate(width / 2, height / 2, -100);
 		float angle = (float) frameCount / 360;
-		rotateX(angle);
-		//rotateY(angle);
-		box(100);
-		line(0, 0, 0, 0, 0, frameCount * 100);
-		rect(24, 96, 24, 96);
+		rotateX(radians(-60));
+		rotateY(-angle);
+
+		//stroke(1);
+		//strokeWeight(0);
+		//box(100);
+
+		stroke(128, 128);
+		strokeWeight(0.5f);
+		line(0, 0, 0, -Integer.MAX_VALUE, 0, 0);
+		line(0, 0, 0, 0, Integer.MAX_VALUE, 0);
+		line(0, 0, 0, 0, 0, Integer.MAX_VALUE);
+		strokeWeight(1f);
+		line(0, 0, 0, Integer.MAX_VALUE, 0, 0);
+		line(0, 0, 0, 0, -Integer.MAX_VALUE, 0);
+		line(0, 0, 0, 0, 0, -Integer.MAX_VALUE);
+
+		stroke(0);
+		strokeWeight(2f);
+		line(0, 0, -min_distance, 0, 0, -Integer.MAX_VALUE);
+
+		strokeWeight(3);
+		point(0, 0, 0);
+
+		//rect(24, 96, 24, 96);
 	}
 
-	@Override
 	public void keyPressed() {
 		super.keyPressed();
 		if (key == ESC) {
 			if (stopping) {
 				key = 0;
 			} else {
-				int a = JOptionPane.showConfirmDialog(frame, "保存されていない情報は破棄されます。", "確認", JOptionPane.OK_CANCEL_OPTION);
+				int a = JOptionPane.showConfirmDialog(null, "保存されていない情報は破棄されます。", "確認", JOptionPane.OK_CANCEL_OPTION);
 				if (a == JOptionPane.OK_OPTION) {
 					stopping = true;
 				} else if (a == JOptionPane.CANCEL_OPTION) {
 					key = 0;
 				}
 			}
-		} else {
-			strokeWeight(1);
+		}
+	}
+
+	public void mapreload() {
+		min_distance = 0.0f;
+		if (Client.map != null) {
+			//TODO
+			//for (int a = 0; a < Client.map)
 		}
 	}
 

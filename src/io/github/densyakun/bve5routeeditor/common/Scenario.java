@@ -43,17 +43,17 @@ public class Scenario implements Serializable {
 
 	//Charset cs;
 
-	HashMap<File, Double> routes = new HashMap<File, Double>();
-	HashMap<File, Double> vehicles = new HashMap<File, Double>();
-	String title;
-	String image;
-	String routeTitle;
-	String vehicleTitle;
-	String author;
-	String comment;
+	private HashMap<File, Double> routes = new HashMap<File, Double>();
+	private HashMap<File, Double> vehicles = new HashMap<File, Double>();
+	private String title;
+	private String image;
+	private String routeTitle;
+	private String vehicleTitle;
+	private String author;
+	private String comment;
 
-	String commentout;
-	String comment_prefix = _COMMENT_PREFIX[0];
+	private String commentout;
+	private String comment_prefix = _COMMENT_PREFIX[0];
 
 	/**
 	 * シナリオファイルの文字セットを取得します。
