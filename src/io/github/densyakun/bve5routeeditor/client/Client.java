@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import io.github.densyakun.bve5routeeditor.common.RouteMap;
 import io.github.densyakun.bve5routeeditor.common.Scenario;
 import processing.core.PApplet;
 
@@ -17,6 +18,7 @@ public class Client {
 
 	public static MySketch _3d_view;
 	public static Scenario scenario;
+	public static RouteMap map;
 
 	public static void main(String[] args) {
 		System.out.println("ClientVer: " + VERSION);
@@ -32,18 +34,12 @@ public class Client {
 			try {
 				scenario = Scenario.read(filechooser.getSelectedFile());
 
-				System.out.println("RoutePath(Random): " + scenario.getRandomRoute());
-				System.out.println("VehiclePath(Random): " + scenario.getRandomVehicle());
-				System.out.println("Title: " + scenario.getTitle());
-				System.out.println("Image: " + scenario.getImage());
-				System.out.println("RouteTitle: " + scenario.getRouteTitle());
-				System.out.println("VehicleTitle: " + scenario.getVehicleTitle());
-				System.out.println("Author: " + scenario.getAuthor());
-				System.out.println("Comment: " + scenario.getComment());
-				System.out.println("CommentOut: " + scenario.getCommentOut());
-				System.out.println("Comment_prefix: " + scenario.getComment_prefix());
+				System.out.println("ScenarioTitle: " + scenario.getTitle());
+				map = RouteMap.read(scenario.getRandomRoute());
+				System.out.println("Comment_prefix: " + map.getComment_prefix());
+				System.out.println("CommentOut: " + map.getCommentOut());
 
-				(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
+				/*(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
 				filechooser.setDialogTitle("シナリオファイルを保存");
 
 				if ((selected = filechooser.showSaveDialog(_3d_view.frame)) == JFileChooser.APPROVE_OPTION){
@@ -53,7 +49,7 @@ public class Client {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				}
+				}*/
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

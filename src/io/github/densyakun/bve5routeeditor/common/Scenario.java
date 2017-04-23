@@ -19,6 +19,7 @@ import org.mozilla.universalchardet.UniversalDetector;
  * @version BVE5RouteEditor0.001alpha
  */
 public class Scenario implements Serializable {
+
 	/**
 	 *
 	 */
@@ -30,7 +31,6 @@ public class Scenario implements Serializable {
 	public static final String VERSION = "2.00";
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 	public static final String HEADER = "BveTs Scenario " + VERSION;
-	public static final String HEADER_BVE5RE = "##### Edited by BVE5RouteEditor. #####";
 	public static final String KEY_ROUTE = "Route";
 	public static final String KEY_VEHICLE = "Vehicle";
 	public static final String KEY_TITLE = "Title";
@@ -53,7 +53,6 @@ public class Scenario implements Serializable {
 	String comment;
 
 	String commentout;
-
 	String comment_prefix = _COMMENT_PREFIX[0];
 
 	/**
@@ -81,7 +80,7 @@ public class Scenario implements Serializable {
 	}
 
 	/**
-	 * マップファイルと重み係数を設定します。重み係数が大きいほど、そのファイルが選ばれる確率が高くなります。
+	 * マップファイルと重み係数を設定します。重み係数が大きいほど、そのマップが選ばれる確率が高くなります。
 	 * @param routes マップファイル(キー)と重み係数(値)
 	 */
 	public void setRoutes(HashMap<File, Double> routes) {
@@ -274,6 +273,11 @@ public class Scenario implements Serializable {
 		this.comment_prefix = comment_prefix;
 	}
 
+	@Override
+	public String toString() {
+		return getTitle();
+	}
+
 	/**
 	 * シナリオファイルを読み込みます。
 	 * @param file ファイル
@@ -323,12 +327,15 @@ public class Scenario implements Serializable {
 
 		String str;
 		for (int b = 0; (str = br.readLine()) != null; b++) {
-			if (!str.equals(HEADER_BVE5RE)) {
+			if (!str.equals(BVE5RouteEditor.HEADER_BVE5RE)) {
 				for (int c = 0; c < _COMMENT_PREFIX.length; c++) {
 					int d = str.indexOf(_COMMENT_PREFIX[c]);
 					if (d != -1) {
 						a[c]++;
-						commentout += str.substring(d + 1) + System.getProperty("line.separator");
+						if (!commentout.isEmpty()) {
+							commentout += System.getProperty("line.separator");
+						}
+						commentout += str.substring(d + 1);
 						str = str.substring(0, d).trim();
 						break;
 					}
@@ -444,16 +451,16 @@ public class Scenario implements Serializable {
 
 		pw.println(HEADER);
 
-		pw.println(HEADER_BVE5RE);
+		pw.println(BVE5RouteEditor.HEADER_BVE5RE);
 
 		String a = KEY_ROUTE + " = ";
-		File[] filekeys = scenario.getRoutes().keySet().toArray(new File[0]);
-		for (int b = 0; b < filekeys.length; b++) {
+		File[] routes = scenario.getRoutes().keySet().toArray(new File[0]);
+		for (int b = 0; b < routes.length; b++) {
 			if (b != 0) {
 				a += " | ";
 			}
-			a += file.getParentFile().toPath().relativize(filekeys[b].toPath());
-			double c = scenario.getRoutes().get(filekeys[b]);
+			a += file.getParentFile().toPath().relativize(routes[b].toPath());
+			double c = scenario.getRoutes().get(routes[b]);
 			if (c != 1.0) {
 				a += " * " + c;
 			}
@@ -461,13 +468,13 @@ public class Scenario implements Serializable {
 		pw.println(a);
 
 		a = KEY_VEHICLE + " = ";
-		filekeys = scenario.getVehicles().keySet().toArray(new File[0]);
-		for (int b = 0; b < filekeys.length; b++) {
+		File[] vehiclefiles = scenario.getVehicles().keySet().toArray(new File[0]);
+		for (int b = 0; b < vehiclefiles.length; b++) {
 			if (b != 0) {
 				a += " | ";
 			}
-			a += file.getParentFile().toPath().relativize(filekeys[b].toPath());
-			double c = scenario.getVehicles().get(filekeys[b]);
+			a += file.getParentFile().toPath().relativize(vehiclefiles[b].toPath());
+			double c = scenario.getVehicles().get(vehiclefiles[b]);
 			if (c != 1.0) {
 				a += " * " + c;
 			}

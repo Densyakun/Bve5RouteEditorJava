@@ -15,5 +15,9 @@ public class BVE5RouteEditor {
 	 * BVE5RouteEditorのバージョン。
 	 */
 	public static final String VERSION = "0.001alpha";
+	/**
+	 * ファイルに記録する文字列。
+	 */
+	public static final String HEADER_BVE5RE = "##### Edited by BVE5RouteEditor. #####";
 
 }
