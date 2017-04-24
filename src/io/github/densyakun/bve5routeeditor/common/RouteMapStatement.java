@@ -17,7 +17,7 @@ public class RouteMapStatement implements Serializable {
 	private RouteMapElement element;
 	private String function;
 	private Object[] args;
-	private RouteMapElement element2;
+	private String element2;
 	private String element_key;
 
 	public RouteMapStatement(RouteMapElement element, String function, Object[] args) {
@@ -50,11 +50,11 @@ public class RouteMapStatement implements Serializable {
 		this.args = args;
 	}
 
-	public RouteMapElement getElement2() {
+	public String getElement2() {
 		return element2;
 	}
 
-	public void setElement2(RouteMapElement element2) {
+	public void setElement2(String element2) {
 		this.element2 = element2;
 	}
 
@@ -73,7 +73,7 @@ public class RouteMapStatement implements Serializable {
 			str += "['" + element_key + "']";
 		}
 		if (element2 != null) {
-			str += "." + element2.name();
+			str += "." + element2;
 		}
 		str += "." + function + "(";
 		for (int a = 0; a < args.length; a++) {

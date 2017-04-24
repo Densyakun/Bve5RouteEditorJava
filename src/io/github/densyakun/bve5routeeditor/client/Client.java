@@ -1,5 +1,6 @@
 package io.github.densyakun.bve5routeeditor.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -44,32 +45,47 @@ public class Client {
 				scenario = Scenario.read(filechooser.getSelectedFile());
 
 				System.out.println("ScenarioTitle: " + scenario.getTitle());
-				map = RouteMap.read(scenario.getRandomRoute());
-				mapreload();
-				int a = 0;
-				Iterator<Double> b = map.getStatements().keySet().iterator();
-				while (b.hasNext()) {
-					Iterator<RouteMapStatement> c = map.getStatements().get(b.next()).iterator();
-					while (c.hasNext()) {
-						c.next();
-						a++;
+				File mapfile = scenario.getRandomRoute();
+				if (mapfile != null) {
+					map = RouteMap.read(mapfile);
+					mapreload();
+					int a = 0;
+					Iterator<Double> b = map.getStatements().keySet().iterator();
+					while (b.hasNext()) {
+						Iterator<RouteMapStatement> c = map.getStatements().get(b.next()).iterator();
+						while (c.hasNext()) {
+							c.next();
+							a++;
+						}
+					}
+					System.out.println("Statements(" + a + "): " + map.getStatements());
+
+					/*(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
+					filechooser.setDialogTitle("シナリオファイルを保存");
+
+					if ((selected = filechooser.showSaveDialog(null)) == JFileChooser.APPROVE_OPTION) {
+						try {
+							Scenario.write(scenario, filechooser.getSelectedFile());
+							System.out.println("保存しました");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}*/
+
+					(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
+					filechooser.setDialogTitle("マップファイルを保存");
+
+					if ((selected = filechooser.showSaveDialog(null)) == JFileChooser.APPROVE_OPTION) {
+						try {
+							RouteMap.write(map, filechooser.getSelectedFile());
+							System.out.println("保存しました");
+						} catch (IOException e) {
+							e.printStackTrace();//TODO
+						}
 					}
 				}
-				System.out.println("Statements(" + a + "): " + map.getStatements());
-
-				/*(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
-				filechooser.setDialogTitle("シナリオファイルを保存");
-
-				if ((selected = filechooser.showSaveDialog(null)) == JFileChooser.APPROVE_OPTION){
-					try {
-						Scenario.write(scenario, filechooser.getSelectedFile());
-						System.out.println("保存しました");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}*/
 			} catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace();//TODO
 			}
 		}
 	}

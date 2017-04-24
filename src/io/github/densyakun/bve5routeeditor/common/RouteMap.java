@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
@@ -30,7 +30,8 @@ public class RouteMap implements Serializable {
 	 * 対応するマップファイルの最新バージョン
 	 */
 	public static final String VERSION = "2.02";
-	public static final String HEADER = "BveTs Map " + VERSION;
+	public static final String HEADER_ = "BveTs Map ";
+	public static final String HEADER = HEADER_ + VERSION;
 	public static final String SUFFIX = ";";
 	public static final String[] _COMMENT_PREFIX = new String[]{"#", "//"};
 
@@ -121,7 +122,7 @@ public class RouteMap implements Serializable {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), cs));
 
-		RouteMap routemap = new RouteMap();//TODO map
+		RouteMap map = new RouteMap();
 		HashMap<Double, ArrayList<RouteMapStatement>> statements = new HashMap<Double, ArrayList<RouteMapStatement>>();
 		HashMap<Double, String> commentout = new HashMap<Double, String>();
 
@@ -132,12 +133,13 @@ public class RouteMap implements Serializable {
 			a[b] = 0;
 		}
 
-		double distance = 0.0;//TODO
+		double distance = 0.0;
 		String statement = "";
 
 		String str;
 		for (int b = 0; (str = br.readLine()) != null; b++) {
 			if (!str.equals(BVE5RouteEditor.HEADER_BVE5RE)) {
+				str = str.trim();
 				for (int c = 0; c < _COMMENT_PREFIX.length; c++) {
 					int d = str.indexOf(_COMMENT_PREFIX[c]);
 					if (d != -1) {
@@ -154,10 +156,16 @@ public class RouteMap implements Serializable {
 					}
 				}
 
-				if (b != 0) {
-					String[] z = str.split(SUFFIX);//TODO c
-					for (int d = 0; d < z.length; d++) {
-						statement += z[d].trim();
+				if (b == 0) {
+					/*TODO 動かない
+					if (!str.startsWith(HEADER_)) {
+						System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+						break;
+					}*/
+				} else {
+					String[] c = str.split(SUFFIX);
+					for (int d = 0; d < c.length; d++) {
+						statement += c[d].trim();
 						try {
 							distance = Double.valueOf(statement);
 						} catch (NumberFormatException e) {
@@ -178,51 +186,98 @@ public class RouteMap implements Serializable {
 										for (int n = 0; n < m.length; n++) {
 											if (m[n].name().equalsIgnoreCase(k)) {
 												l = false;
+
 												String[] o = statement.substring(f + 1, g).split(",");
-												Object[] p = new Object[o.length];
-												for (int q = 0; q < o.length; q++) {
-													String r = o[q].trim();
-													if (r.isEmpty()) {
-														p[q] = null;
-													} else if (r.startsWith("'") && r.endsWith("'")) {//TODO "
-														p[q] = r.substring(1, r.length() - 1);
-													} else {
-														try {
-															p[q] = Integer.valueOf(r);
-														} catch (NumberFormatException x) {
+												Object[] p;
+												if (o.length == 1 && o[0].isEmpty()) {
+													p = new Object[0];
+												} else {
+													p = new Object[o.length];
+													for (int q = 0; q < o.length; q++) {
+														String r = o[q].trim();
+														if (r.isEmpty()) {
+															p[q] = null;
+														} else if (r.startsWith("'") && r.endsWith("'")) {
+															p[q] = r.substring(1, r.length() - 1);
+														} else {
 															try {
 																p[q] = Double.valueOf(r);
 															} catch (NumberFormatException ex) {
-																System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+																try {
+																	p[q] = Integer.valueOf(r);
+																} catch (NumberFormatException x) {
+																	System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+																}
 															}
 														}
 													}
 												}
-												boolean q = true;
-												String[] r = RouteMapElement.getFunctions(m[n]);
-												for (int s = 0; s < r.length; s++) {
-													if (r[s].equalsIgnoreCase(h[h.length - 1])) {
-														q = false;
-														RouteMapStatement t = new RouteMapStatement(m[n], r[s], p);
-														if (i != -1 && j != -1) {
-															String u = statement.substring(i + 1, j);
-															if (u.startsWith("'") && u.endsWith("'")) {//TODO "
-																t.setElement_key(u.substring(1, u.length() - 1));
+												String q = null;
+												if (2 < h.length) {
+													boolean r = true;
+													for (int s = 0; s < m.length; s++) {
+														if (m[s].name().equalsIgnoreCase(h[1])) {
+															r = false;
+
+															q = m[s].name();
+															break;
+														}
+													}
+													if (r) {
+														System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+													}
+												}
+
+												boolean u = true;
+												String[] v = RouteMapElement.getFunctions(m[n]);
+												for (int w = 0; w < v.length; w++) {
+													if (v[w].equalsIgnoreCase(h[h.length - 1])) {
+														u = false;
+
+														Object[][] x = RouteMapElement.getArguments(m[n], v[w]);
+														boolean y = true;
+														for (int z = 0; z < x.length; z++) {
+															boolean aa = true;
+															if (p.length == x[z].length) {
+																for (int ab = 0; ab < x[z].length; ab++) {
+																	if (!(p[z].getClass().isInstance(x[z][ab]))) {
+																		aa = false;
+																		break;
+																	}
+																}
+															} else {
+																aa = false;
+															}
+															if (aa) {
+																y = false;
+																break;
 															}
 														}
-														if (2 < h.length) {
-															t.setElement2(RouteMapElement.valueOf(h[1]));
+
+														if (y) {
+															System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+														} else {
+															RouteMapStatement z = new RouteMapStatement(m[n], v[w], p);
+															if (i != -1 && j != -1) {
+																String aa = statement.substring(i + 1, j);
+																if (aa.startsWith("'") && aa.endsWith("'")) {
+																	z.setElement_key(aa.substring(1, aa.length() - 1));
+																}
+															}
+															if (q != null) {
+																z.setElement2(q);
+															}
+															ArrayList<RouteMapStatement> aa = statements.get(distance);
+															if (aa == null) {
+																aa = new ArrayList<RouteMapStatement>();
+															}
+															aa.add(z);
+															statements.put(distance, aa);
 														}
-														ArrayList<RouteMapStatement> v = statements.get(distance);
-														if (v == null) {
-															v = new ArrayList<RouteMapStatement>();
-														}
-														v.add(t);
-														statements.put(distance, v);
 														break;
 													}
 												}
-												if (q) {
+												if (u) {
 													System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 												}
 												break;
@@ -252,19 +307,18 @@ public class RouteMap implements Serializable {
 				b = c;
 			}
 		}
-		routemap.setComment_prefix(_COMMENT_PREFIX[b]);
+		map.setComment_prefix(_COMMENT_PREFIX[b]);
 
-		routemap.setStatements(statements);
-		routemap.setCommentOut(commentout);
-		return routemap;
+		map.setStatements(statements);
+		map.setCommentOut(commentout);
+		return map;
 	}
 
-	/**TODO
-	 * マップファイルに書き込みます。保存先はmap.setMapfile(File)で設定します。
+	/**
+	 * マップファイルに書き込みます。
 	 * @param scenario シナリオデータ
 	 * @param file ファイル
 	 * @throws IOException 入出力エラーが発生した場合
-	 * @deprecated
 	 */
 	public static void write(RouteMap map, File file) throws IOException {
 		/*Charset cs = scenario.getCharset();
@@ -278,49 +332,34 @@ public class RouteMap implements Serializable {
 
 		pw.println(BVE5RouteEditor.HEADER_BVE5RE);
 
-		/*String a = KEY_ROUTE + " = ";
-		RouteMap[] routes = scenario.getRoutes().keySet().toArray(new RouteMap[0]);
-		for (int b = 0; b < routes.length; b++) {
-			if (b != 0) {
-				a += " | ";
-			}
-			a += file.getParentFile().toPath().relativize(routes[b].getMapfile().toPath());
-			double c = scenario.getRoutes().get(routes[b]);
-			if (c != 1.0) {
-				a += " * " + c;
+		ArrayList<Double> a = new ArrayList<Double>(map.statements.keySet());
+		Double[] b = map.getCommentOut().keySet().toArray(new Double[0]);
+		for (int c = 0; c < b.length; c++) {
+			if (!a.contains(b[c])) {
+				a.add(b[c]);
 			}
 		}
-		pw.println(a);
-
-		a = KEY_VEHICLE + " = ";
-		File[] vehiclefiles = scenario.getVehicles().keySet().toArray(new File[0]);
-		for (int b = 0; b < vehiclefiles.length; b++) {
-			if (b != 0) {
-				a += " | ";
+		Collections.sort(a);
+		for (int c = 0; c < a.size(); c++) {
+			double d = a.get(c);
+			if (d != 0.0) {
+				if (d == (int) d) {
+					pw.println((int) d + SUFFIX);
+				} else {
+					pw.println(d + SUFFIX);
+				}
 			}
-			a += file.getParentFile().toPath().relativize(vehiclefiles[b].toPath());
-			double c = scenario.getVehicles().get(vehiclefiles[b]);
-			if (c != 1.0) {
-				a += " * " + c;
+			String e = map.commentout.get(d);
+			if (e != null && !e.isEmpty()) {
+				String[] f = e.split(System.getProperty("line.separator"));
+				for (int g = 0; g < f.length; g++) {
+					pw.println(map.getComment_prefix() + f[g]);
+				}
 			}
-		}
-		pw.println(a);
-
-		pw.println(KEY_TITLE + " = " + scenario.getTitle());
-		pw.println(KEY_IMAGE + " = " + scenario.getImage());
-		pw.println(KEY_ROUTE_TITLE + " = " + scenario.getRouteTitle());
-		pw.println(KEY_VEHICLE_TITLE + " = " + scenario.getVehicleTitle());
-		pw.println(KEY_AUTHOR + " = " + scenario.getAuthor());
-		pw.println(KEY_COMMENT + " = " + scenario.getComment());*/
-
-		HashMap<Double, String> b = map.getCommentOut();
-		Iterator<Double> c = b.keySet().iterator();
-		while (c.hasNext()) {
-			String d = b.get(c.next());
-			if (!d.isEmpty()) {
-				String[] e = d.split(System.getProperty("line.separator"));
-				for (int f = 0; f < e.length; f++) {
-					pw.println(map.getComment_prefix() + e[f]);
+			ArrayList<RouteMapStatement> f = map.statements.get(d);
+			if (f != null) {
+				for (int g = 0; g < f.size(); g++) {
+					pw.println(f.get(g) + SUFFIX);
 				}
 			}
 		}

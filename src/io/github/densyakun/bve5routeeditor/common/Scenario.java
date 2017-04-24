@@ -30,7 +30,8 @@ public class Scenario implements Serializable {
 	 */
 	public static final String VERSION = "2.00";
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-	public static final String HEADER = "BveTs Scenario " + VERSION;
+	public static final String HEADER_ = "BveTs Scenario ";
+	public static final String HEADER = HEADER_ + VERSION;
 	public static final String KEY_ROUTE = "Route";
 	public static final String KEY_VEHICLE = "Vehicle";
 	public static final String KEY_TITLE = "Title";
@@ -328,6 +329,7 @@ public class Scenario implements Serializable {
 		String str;
 		for (int b = 0; (str = br.readLine()) != null; b++) {
 			if (!str.equals(BVE5RouteEditor.HEADER_BVE5RE)) {
+				str = str.trim();
 				for (int c = 0; c < _COMMENT_PREFIX.length; c++) {
 					int d = str.indexOf(_COMMENT_PREFIX[c]);
 					if (d != -1) {
@@ -346,7 +348,13 @@ public class Scenario implements Serializable {
 						scenario.setCharset(Charset.forName(str.substring(b + 1)));
 					}
 				} else {*/
-				if (b != 0) {
+				if (b == 0) {
+					/*TODO 動かない
+					if (!str.startsWith(HEADER_)) {
+						System.out.println("シナリオファイルに構文エラーがあります。 " + (b + 1) + "行目");
+						break;
+					}*/
+				} else {
 					if (str.startsWith(KEY_ROUTE_TITLE)) {
 						int c = str.indexOf('=', KEY_ROUTE_TITLE.length());
 						if (c != -1) {
