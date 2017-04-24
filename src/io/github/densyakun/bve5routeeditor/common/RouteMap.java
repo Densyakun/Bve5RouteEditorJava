@@ -140,6 +140,8 @@ public class RouteMap implements Serializable {
 		for (int b = 0; (str = br.readLine()) != null; b++) {
 			if (!str.equals(BVE5RouteEditor.HEADER_BVE5RE)) {
 				str = str.trim();
+
+				//コメントアウト文の処理
 				for (int c = 0; c < _COMMENT_PREFIX.length; c++) {
 					int d = str.indexOf(_COMMENT_PREFIX[c]);
 					if (d != -1) {
@@ -156,20 +158,30 @@ public class RouteMap implements Serializable {
 					}
 				}
 
+				//ヘッダー判定
+				//TODO 文字コードの判定はシナリオから
 				if (b == 0) {
-					/*TODO 動かない
+					/*TODO 何故か動かない
 					if (!str.startsWith(HEADER_)) {
 						System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 						break;
 					}*/
 				} else {
+
+					//ステートメントの読み込み
 					String[] c = str.split(SUFFIX);
 					for (int d = 0; d < c.length; d++) {
 						statement += c[d].trim();
 						try {
+							//TODO 変数などに対応させるため引数と同じような処理にする
+							//距離程
 							distance = Double.valueOf(statement);
-						} catch (NumberFormatException e) {
+						} catch (NumberFormatException e1) {
+
+							//ステートメント
 							if (!statement.isEmpty()) {
+
+								//TODO 念のため、文字列に反応しないようにする
 								int f = statement.indexOf('(');
 								int g = statement.indexOf(')');
 								if (f != -1 && g != -1) {
@@ -181,104 +193,113 @@ public class RouteMap implements Serializable {
 										if (i != -1) {
 											k = k.substring(0, i);
 										}
+
+										//マップ要素の判定
 										boolean l = true;
 										RouteMapElement[] m = RouteMapElement.values();
 										for (int n = 0; n < m.length; n++) {
 											if (m[n].name().equalsIgnoreCase(k)) {
 												l = false;
 
+												//引数の読み込み
 												String[] o = statement.substring(f + 1, g).split(",");
-												Object[] p;
+												Object[] args;
 												if (o.length == 1 && o[0].isEmpty()) {
-													p = new Object[0];
+													args = new Object[0];
 												} else {
-													p = new Object[o.length];
-													for (int q = 0; q < o.length; q++) {
-														String r = o[q].trim();
-														if (r.isEmpty()) {
-															p[q] = null;
-														} else if (r.startsWith("'") && r.endsWith("'")) {
-															p[q] = r.substring(1, r.length() - 1);
+													args = new Object[o.length];
+													for (int p = 0; p < o.length; p++) {
+														String q = o[p].trim();
+														if (q.isEmpty()) {
+															args[p] = null;
+														} else if (q.startsWith("'") && q.endsWith("'")) {
+															args[p] = q.substring(1, q.length() - 1);
 														} else {
 															try {
-																p[q] = Double.valueOf(r);
-															} catch (NumberFormatException ex) {
-																try {
-																	p[q] = Integer.valueOf(r);
-																} catch (NumberFormatException x) {
-																	System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+																args[p] = Double.valueOf(q);
+															} catch (NumberFormatException e3) {
+																if (q.isEmpty()) {
+																	args[p] = null;
+																} else {
+																	//構文エラー
+																	args = null;
 																}
 															}
 														}
 													}
 												}
-												String q = null;
-												if (2 < h.length) {
-													boolean r = true;
-													for (int s = 0; s < m.length; s++) {
-														if (m[s].name().equalsIgnoreCase(h[1])) {
-															r = false;
 
-															q = m[s].name();
-															break;
-														}
-													}
-													if (r) {
-														System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
-													}
-												}
+												if (args == null) {
+													System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+												} else {
+													//キー要素(第二マップ要素)の読み込み
+													String element2 = null;
+													if (2 < h.length) {
+														boolean p = true;
+														String[] q = RouteMapElement.getElements2(m[n]);
+														for (int r = 0; r < q.length; r++) {
+															if (q[r].equalsIgnoreCase(h[1])) {
+																p = false;
 
-												boolean u = true;
-												String[] v = RouteMapElement.getFunctions(m[n]);
-												for (int w = 0; w < v.length; w++) {
-													if (v[w].equalsIgnoreCase(h[h.length - 1])) {
-														u = false;
-
-														Object[][] x = RouteMapElement.getArguments(m[n], v[w]);
-														boolean y = true;
-														for (int z = 0; z < x.length; z++) {
-															boolean aa = true;
-															if (p.length == x[z].length) {
-																for (int ab = 0; ab < x[z].length; ab++) {
-																	if (!(p[z].getClass().isInstance(x[z][ab]))) {
-																		aa = false;
-																		break;
-																	}
-																}
-															} else {
-																aa = false;
-															}
-															if (aa) {
-																y = false;
+																element2 = q[r];
 																break;
 															}
 														}
-
-														if (y) {
+														if (p) {
 															System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
-														} else {
-															RouteMapStatement z = new RouteMapStatement(m[n], v[w], p);
+														}
+													}
+
+													//関数の判定
+													boolean p = true;
+													String[] q = RouteMapElement.getFunctions(m[n], element2);
+													for (int r = 0; r < q.length; r++) {
+														if (q[r].equalsIgnoreCase(h[h.length - 1])) {
+															p = false;
+
+															//キーが設定されている場合はキーを読み込む
+															String key = null;
+
 															if (i != -1 && j != -1) {
-																String aa = statement.substring(i + 1, j);
-																if (aa.startsWith("'") && aa.endsWith("'")) {
-																	z.setElement_key(aa.substring(1, aa.length() - 1));
+																key = statement.substring(i + 1, j);
+																if (key.startsWith("'") && key.endsWith("'")) {
+																	key = key.substring(1, key.length() - 1);
 																}
 															}
-															if (q != null) {
-																z.setElement2(q);
+
+															//キーが必要か
+															if (RouteMapElement.isRequiredKey(m[n], element2, q[r]) == (key != null)) {
+
+																//引数が正しいか
+																if (RouteMapElement.isCollectArguments(m[n], element2, q[r], args)) {
+
+																	//ステートメントの登録
+																	RouteMapStatement s = new RouteMapStatement(m[n], element2, q[r], args);
+
+																	// -μ- .oO zZＺ...
+																	//キーの設定
+																	s.setElement_key(key);
+
+																	//同じ距離程にあるステートメントに追加
+																	ArrayList<RouteMapStatement> t = statements.get(distance);
+																	if (t == null) {
+																		t = new ArrayList<RouteMapStatement>();
+																	}
+																	t.add(s);
+
+																	statements.put(distance, t);
+																} else {
+																	System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+																}
+															} else {
+																System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
 															}
-															ArrayList<RouteMapStatement> aa = statements.get(distance);
-															if (aa == null) {
-																aa = new ArrayList<RouteMapStatement>();
-															}
-															aa.add(z);
-															statements.put(distance, aa);
+															break;
 														}
-														break;
 													}
-												}
-												if (u) {
-													System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+													if (p) {
+														System.out.println("マップファイルに構文エラーがあります。 " + (b + 1) + "行目");
+													}
 												}
 												break;
 											}
@@ -301,6 +322,7 @@ public class RouteMap implements Serializable {
 		}
 		br.close();
 
+		//コメントアウト接頭辞の判定
 		int b = 0;
 		for (int c = 0; c < a.length; c++) {
 			if (a[b] < a[c]) {
@@ -309,8 +331,10 @@ public class RouteMap implements Serializable {
 		}
 		map.setComment_prefix(_COMMENT_PREFIX[b]);
 
+		//マップデータの設定
 		map.setStatements(statements);
 		map.setCommentOut(commentout);
+
 		return map;
 	}
 

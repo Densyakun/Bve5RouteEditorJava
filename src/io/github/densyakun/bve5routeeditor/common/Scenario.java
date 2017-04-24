@@ -343,13 +343,15 @@ public class Scenario implements Serializable {
 					}
 				}
 
+				//ヘッダーと、
+				//TODO 文字コードの判定
 				/*if (a == 0) {
 					if ((b = str.indexOf(':')) != -1) {
 						scenario.setCharset(Charset.forName(str.substring(b + 1)));
 					}
 				} else {*/
 				if (b == 0) {
-					/*TODO 動かない
+					/*TODO 何故か動かない...。動けー！
 					if (!str.startsWith(HEADER_)) {
 						System.out.println("シナリオファイルに構文エラーがあります。 " + (b + 1) + "行目");
 						break;
@@ -429,6 +431,7 @@ public class Scenario implements Serializable {
 		}
 		br.close();
 
+		//コメントアウト接頭辞の判定
 		int b = 0;
 		for (int c = 0; c < a.length; c++) {
 			if (a[b] < a[c]) {
@@ -437,9 +440,11 @@ public class Scenario implements Serializable {
 		}
 		scenario.setComment_prefix(_COMMENT_PREFIX[b]);
 
+		//シナリオデータの設定
 		scenario.setRoutes(routes);
 		scenario.setVehicles(vehicles);
 		scenario.setCommentOut(commentout);
+
 		return scenario;
 	}
 
