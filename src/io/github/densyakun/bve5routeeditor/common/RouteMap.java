@@ -141,18 +141,18 @@ public class RouteMap implements Serializable {
 			if (!str.equals(BVE5RouteEditor.HEADER_BVE5RE)) {
 				str = str.trim();
 
-				//コメントアウト文の処理
+				//コメントアウト文の処理(1)
+				String commentout2 = null;
 				for (int c = 0; c < _COMMENT_PREFIX.length; c++) {
 					int d = str.indexOf(_COMMENT_PREFIX[c]);
 					if (d != -1) {
 						a[c]++;
-						String value = commentout.get(distance);
-						if (value == null) {
-							value = "";
+						if (commentout2 == null) {
+							commentout2 = "";
 						} else {
-							value += System.getProperty("line.separator");
+							commentout2 += System.getProperty("line.separator");
 						}
-						commentout.put(distance, value + str.substring(d + 1));
+						commentout2 += str.substring(d + 1);
 						str = str.substring(0, d).trim();
 						break;
 					}
@@ -315,6 +315,18 @@ public class RouteMap implements Serializable {
 								}
 							}
 						}
+
+						//コメントアウト文の処理(2)
+						if (commentout2 != null) {
+							String value = commentout.get(distance);
+							if (value == null) {
+								value = "";
+							} else {
+								value += System.getProperty("line.separator");
+							}
+							commentout.put(distance, value + commentout2);
+						}
+
 						statement = "";
 					}
 				}
