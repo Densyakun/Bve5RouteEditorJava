@@ -2,7 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/core.jar"/>
+	<classpathentry kind="lib" path="lib/core.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://processing.github.io/processing-javadocs/core/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/gluegen-rt-natives-linux-amd64.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen-rt-natives-linux-armv6hf.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen-rt-natives-linux-i586.jar"/>
@@ -18,5 +22,10 @@
 	<classpathentry kind="lib" path="lib/jogl-all-natives-windows-i586.jar"/>
 	<classpathentry kind="lib" path="lib/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/juniversalchardet-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/eval16.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.ne.jp/asahi/hishidama/home/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
