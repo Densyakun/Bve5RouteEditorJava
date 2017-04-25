@@ -11,7 +11,8 @@ BVE5路線データ編集ソフトです。現在開発中。
 ・電車君より: branch「[densyakun](https://github.com/Densyakun/BVE5RouteEditor/tree/densyakun)」の方で開発中です。シナリオファイル及び、マップファイルの読み書きができますが、変数・演算子・距離程(「数値のみ」を除く)・数学関数はまだ使用できません。
 
 ・ライブラリ「Processing 3.0」を使用しています。<br>
-・ライブラリ「juniversalchardet 1.0.3」を使用しています。
+・ライブラリ「juniversalchardet 1.0.3」を使用しています。<br>
+・ライブラリ「[eval16](http://www.ne.jp/asahi/hishidama/home/tech/soft/java/eval16.html)」を使用しています。
 
 ## Demo
 
@@ -19,4 +20,4 @@ BVE5路線データ編集ソフトです。現在開発中。
 
 ## Licence
 
-[MIT]
+MIT
