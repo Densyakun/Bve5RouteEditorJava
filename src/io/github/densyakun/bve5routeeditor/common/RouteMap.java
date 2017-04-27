@@ -11,8 +11,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.mozilla.universalchardet.UniversalDetector;
+
+import io.github.densyakun.bve5routeeditor.common.linear.Linear;
 
 /**
  * BveTs Map 2.02
@@ -38,6 +41,7 @@ public class RouteMap implements Serializable {
 	private HashMap<Double, ArrayList<RouteMapStatement>> statements = new HashMap<Double, ArrayList<RouteMapStatement>>();
 	private HashMap<Double, String> commentout = new HashMap<Double, String>();
 	private String comment_prefix = _COMMENT_PREFIX[0];
+	private Linear own_linear = null;
 
 	/**
 	 * ステートメントを取得します。
@@ -85,6 +89,35 @@ public class RouteMap implements Serializable {
 	 */
 	public void setComment_prefix(String comment_prefix) {
 		this.comment_prefix = comment_prefix;
+	}
+
+	public Linear getOwn_Linear() {
+		if (own_linear == null) {
+			load_own_linear();
+		}
+		return own_linear;
+	}
+
+	//TODO
+	/*public void setOwn_Linear(Linear own_linear) {
+		this.own_linear = own_linear;
+	}*/
+
+	private void load_own_linear() {
+		own_linear = new Linear();
+		HashMap<Double, Double> curvePoints = new HashMap<Double, Double>();
+
+		Iterator<Double> a = statements.keySet().iterator();
+		while (a.hasNext()) {
+			ArrayList<RouteMapStatement> b = statements.get(a.next());
+			for (int c = 0; c < b.size(); c++) {
+				if (b.get(c).getElement() == RouteMapElement.Curve) {
+
+				}
+			}
+		}
+
+		own_linear.setCurvePoints(curvePoints);
 	}
 
 	/**

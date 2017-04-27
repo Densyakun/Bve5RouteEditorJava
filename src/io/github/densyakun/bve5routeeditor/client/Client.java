@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import io.github.densyakun.bve5routeeditor.common.RouteMap;
 import io.github.densyakun.bve5routeeditor.common.RouteMapStatement;
 import io.github.densyakun.bve5routeeditor.common.Scenario;
+import processing.core.PApplet;
 
 public class Client {
 
@@ -33,7 +34,7 @@ public class Client {
 	public static void main(String[] args) {
 		System.out.println("ClientVer: " + VERSION);
 
-		//PApplet.main(new String[] { "--location=100,100", MySketch.class.getName() });
+		PApplet.main(new String[] { "--location=100,100", MySketch.class.getName() });
 
 		JFileChooser filechooser = new JFileChooser();
 		filechooser.setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
@@ -91,7 +92,7 @@ public class Client {
 	}
 
 	public static void mapreload() {
-		//_3d_view.mapreload();
+		_3d_view.mapreload();
 	}
 
 }
