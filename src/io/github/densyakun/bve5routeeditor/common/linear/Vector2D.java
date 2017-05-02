@@ -62,7 +62,7 @@ public class Vector2D implements Serializable {
 	}
 
 	public double length() {
-		return Math.sqrt(x * x + y * y);
+		return Math.abs(Math.sqrt(x * x + y * y));
 	}
 
 	public Vector2D normalize() {
@@ -70,15 +70,14 @@ public class Vector2D implements Serializable {
 	}
 
 	public double rad() {
-		return rad(this, RIGHT);
+		return rad(RIGHT, this);
 	}
 
 	public Vector2D rotate(double rad) {
 		Vector2D v = new Vector2D(this);
-		double d = rad();
-		double length = length();
-		v.x = Math.cos(d + rad) * length;
-		v.y = Math.sin(d + rad) * length;
+		double r = rad() + rad;
+		v.x = x * Math.cos(r) - y * Math.sin(r);
+		v.y = x * Math.sin(r) + y * Math.cos(r);
 		return v;
 	}
 
@@ -101,7 +100,11 @@ public class Vector2D implements Serializable {
 	}
 
 	public static double rad(Vector2D v1, Vector2D v2) {
-		return dot(v1, v2) / v1.length() * v2.length();
+		double a = dot(v1, v2) / v1.length() * v2.length();
+		if (a >= 180.0) {
+			return a - 360.0;
+		}
+		return a;
 	}
 
 }

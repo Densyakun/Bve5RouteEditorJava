@@ -11,7 +11,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
@@ -107,12 +106,17 @@ public class RouteMap implements Serializable {
 		own_linear = new Linear();
 		HashMap<Double, Double> curvePoints = new HashMap<Double, Double>();
 
-		Iterator<Double> a = statements.keySet().iterator();
-		while (a.hasNext()) {
-			ArrayList<RouteMapStatement> b = statements.get(a.next());
-			for (int c = 0; c < b.size(); c++) {
-				if (b.get(c).getElement() == RouteMapElement.Curve) {
-
+		Double[] a = statements.keySet().toArray(new Double[0]);
+		for (int b = 0; b < a.length; b++) {
+			ArrayList<RouteMapStatement> c = statements.get(a[b]);
+			for (int d = 0; d < c.size(); d++) {
+				RouteMapStatement e = c.get(d);
+				if (e.getElement() == RouteMapElement.Curve) {
+					if (e.getFunction().equalsIgnoreCase("BeginCircular") || e.getFunction().equalsIgnoreCase("Begin")) {
+						curvePoints.put(a[b], (Double) e.getArguments()[0]);
+					} else if (e.getFunction().equalsIgnoreCase("End")) {
+						curvePoints.put(a[b], 0.0);
+					}
 				}
 			}
 		}

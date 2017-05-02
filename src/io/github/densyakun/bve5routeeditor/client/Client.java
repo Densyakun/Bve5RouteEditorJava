@@ -2,13 +2,11 @@ package io.github.densyakun.bve5routeeditor.client;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import io.github.densyakun.bve5routeeditor.common.RouteMap;
-import io.github.densyakun.bve5routeeditor.common.RouteMapStatement;
 import io.github.densyakun.bve5routeeditor.common.Scenario;
 import processing.core.PApplet;
 
@@ -41,7 +39,7 @@ public class Client {
 		filechooser.setDialogTitle("シナリオファイルを開く");
 
 		int selected = filechooser.showOpenDialog(null);
-		if (selected == JFileChooser.APPROVE_OPTION){
+		if (selected == JFileChooser.APPROVE_OPTION) {
 			try {
 				scenario = Scenario.read(filechooser.getSelectedFile());
 
@@ -50,7 +48,7 @@ public class Client {
 				if (mapfile != null) {
 					map = RouteMap.read(mapfile);
 					mapreload();
-					int a = 0;
+					/*int a = 0;
 					Iterator<Double> b = map.getStatements().keySet().iterator();
 					while (b.hasNext()) {
 						Iterator<RouteMapStatement> c = map.getStatements().get(b.next()).iterator();
@@ -59,7 +57,7 @@ public class Client {
 							a++;
 						}
 					}
-					System.out.println("Statements(" + a + "): " + map.getStatements());
+					System.out.println("Statements(" + a + "): " + map.getStatements());*/
 
 					/*(filechooser = new JFileChooser()).setFileFilter(new FileNameExtensionFilter("txtファイル", "txt"));
 					filechooser.setDialogTitle("シナリオファイルを保存");
@@ -88,6 +86,9 @@ public class Client {
 			} catch (IOException e) {
 				e.printStackTrace();//TODO
 			}
+		} else {
+			map = new RouteMap();
+			mapreload();
 		}
 	}
 

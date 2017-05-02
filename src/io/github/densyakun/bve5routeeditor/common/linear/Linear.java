@@ -33,33 +33,34 @@ public class Linear implements Serializable {
 	public Vector2D getPosition(double distance) {
 		Vector2D a = new Vector2D();
 
-		double b = 0.0;
-		double c = 0.0;
-		ArrayList<Double> d = new ArrayList<Double>(curvePoints.keySet());
-		Collections.sort(d);
-		for (int e = 0; e < d.size(); e++) {
-			double f = d.get(e);
-			if (c != 0.0) {
-				double g = curvePoints.get(c);
-				double h = curvePoints.get(f);
-				double i = c - f / h;
-
-				// true=cからeまで直線 false=cからeまで曲線
-				if (g == h) {
-					a.add(new Vector2D(0.0, Math.min(f, distance) - c).rotate(b + i));
-					if (distance < f) {
-						break;
-					}
-				} else {
-					if (distance < f) {
-
-						break;
-					}
-				}
-
-				b += i;
+		ArrayList<Double> b = new ArrayList<Double>(curvePoints.keySet());
+		Collections.sort(b);
+		double d1 = 0.0;
+		double r1 = 0.0;
+		double rad = 0.0;
+		for (int e = 0; e < b.size(); e++) {
+			double d2 = Math.min(b.get(e), distance);
+			double r2 = curvePoints.get(d2);
+			if (r2 != 0.0) {
+				r2 = (d2 - d1) / r2;
 			}
-			c = f;
+
+			// true=cからeまで直線 false=cからeまで曲線
+			if (r1 == 0) {
+				a = a.add(Vector2D.UP.multiply(d2 - d1).rotate(rad));
+				if (distance <= d1) {
+					break;
+				}
+			} else {
+				//a = a.add(Vector2D.UP.multiply(d2 - d1).rotate(rad + r2));
+				if (distance <= d1) {
+					break;
+				}
+			}
+
+			d1 = d2;
+			r1 = r2;
+			rad += r2;
 		}
 
 		return a;
