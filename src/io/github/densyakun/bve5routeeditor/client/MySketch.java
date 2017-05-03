@@ -42,7 +42,6 @@ public class MySketch extends PApplet {
 		//TODO ウィンドウを最大化出来ないようにする
 	}
 
-	//TODO 距離程目盛り
 	public void draw() {
 		float[] a = Color.RGBtoHSB(bg.getRed(), bg.getGreen(), bg.getBlue(), new float[3]);
 		bg = Color.getHSBColor(a[0] + 1.0f / 360 / 4, a[1], a[2]);
@@ -60,7 +59,7 @@ public class MySketch extends PApplet {
 
 		pushMatrix();
 
-		perspective(fov * PI / 180f, width / height, 3200.0f, 0.0f);
+		perspective(fov * PI / 180f, width / height, 10000.0f, 0.0f);
 		translate(width / 2 - x, height / 2 - y, zoom);
 		//ry += (float) frameCount / 360;
 		rotateX(-radians(rx));
@@ -88,6 +87,7 @@ public class MySketch extends PApplet {
 		stroke(0);
 		strokeWeight(1f);
 
+		//TODO 距離程目盛り
 		for (int b = 0; b < linears.size(); b++) {
 			Linear c = linears.get(b);
 			HashMap<Double, Double> d = c.getCurvePoints();

@@ -37,30 +37,28 @@ public class Linear implements Serializable {
 		Collections.sort(b);
 		double d1 = 0.0;
 		double r1 = 0.0;
-		double rad = 0.0;
+		double rad1 = 0.0;
 		for (int e = 0; e < b.size(); e++) {
-			double d2 = Math.min(b.get(e), distance);
-			double r2 = curvePoints.get(d2);
-			if (r2 != 0.0) {
-				r2 = (d2 - d1) / r2;
+			double d2 = b.get(e);
+			if (d1 > d2) {
+				d1 = d2;
 			}
+			double d3 = Math.min(d2, distance);
+			double r2 = curvePoints.get(d2);
+			double rad2 = r2 == 0.0 ? 0.0 : (d3 - d1) / r2;
 
 			// true=cからeまで直線 false=cからeまで曲線
-			if (r1 == 0) {
-				a = a.add(Vector2D.UP.multiply(d2 - d1).rotate(rad));
-				if (distance <= d1) {
-					break;
-				}
+			if (r1 == 0.0) {
+				a = a.add(Vector2D.UP.multiply(d3 - d1).rotate(rad1));
 			} else {
-				//a = a.add(Vector2D.UP.multiply(d2 - d1).rotate(rad + r2));
-				if (distance <= d1) {
-					break;
-				}
+				//a = a.add(Vector2D.UP.multiply(d3 - d1).rotate(rad1 + r2));
 			}
-
+			if (distance <= d2) {
+				break;
+			}
 			d1 = d2;
 			r1 = r2;
-			rad += r2;
+			rad1 += rad2;
 		}
 
 		return a;
