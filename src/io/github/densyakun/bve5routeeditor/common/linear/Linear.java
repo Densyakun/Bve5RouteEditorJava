@@ -35,29 +35,32 @@ public class Linear implements Serializable {
 
 		ArrayList<Double> b = new ArrayList<Double>(curvePoints.keySet());
 		Collections.sort(b);
-		double d1 = 0.0;
-		double r1 = 0.0;
-		double rad1 = 0.0;
+		double d1 = 0.0;//距離
+		double r1 = 0.0;//曲線半径
+		double rad1 = 0.0;//現在の角度
 		for (int e = 0; e < b.size(); e++) {
-			double d2 = b.get(e);
-			if (d1 > d2) {
+			double d2 = Math.min(b.get(e), distance);//次の点の距離
+			double r2 = curvePoints.get(d2);//次の点からの曲線半径
+			//System.out.println(e + "=" + d2);
+			if (e == 0 && d1 > d2) {
 				d1 = d2;
 			}
-			double d3 = Math.min(d2, distance);
-			double r2 = curvePoints.get(d2);
-			double rad2 = r2 == 0.0 ? 0.0 : (d3 - d1) / r2;
 
-			// true=cからeまで直線 false=cからeまで曲線
-			if (r1 == 0.0) {
-				a = a.add(Vector2D.UP.multiply(d3 - d1).rotate(rad1));
-			} else {
-				//a = a.add(Vector2D.UP.multiply(d3 - d1).rotate(rad1 + r2));
+			if (r1 == 0.0)
+				a = a.add(Vector2D.UP.multiply(d2 - d1).rotate(rad1));
+			else {
+				double r11 = Math.abs(r1);//半径
+				double w = (d2 - d1) / r11;//弧の長さ
+				double x = Math.cos(w) - 1;
+				a = a.add(new Vector2D(0 <= r1 ? x : -x, Math.sin(w)));
 			}
-			if (distance <= d2) {
+
+			if (distance == d2)
 				break;
-			}
+
 			d1 = d2;
 			r1 = r2;
+			double rad2 = r2 == 0.0 ? 0.0 : (d2 - d1) / Math.abs(r2);
 			rad1 += rad2;
 		}
 

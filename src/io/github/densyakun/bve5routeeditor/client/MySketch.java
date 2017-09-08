@@ -23,8 +23,6 @@ public class MySketch extends PApplet {
 	boolean stopping = false;
 	float rx = radians(-30);
 	float ry = 0.0f;
-	float min_distance = 0.0f;
-	float max_distance = 0.0f;
 	List<Linear> linears = new ArrayList<Linear>();
 
 	//-注意-
@@ -71,14 +69,14 @@ public class MySketch extends PApplet {
 
 		strokeWeight(0.8f);
 		stroke(255, 0, 0);
-		line(0, 0, 0, Integer.MIN_VALUE, 0, 0);
+		line(0, 0, 0, Integer.MAX_VALUE, 0, 0);
 		stroke(0, 255, 0);
 		line(0, 0, 0, 0, Integer.MIN_VALUE, 0);
 		stroke(0, 0, 255);
 		line(0, 0, 0, 0, 0, Integer.MIN_VALUE);
 		strokeWeight(0.5f);
 		stroke(128, 0, 0);
-		line(0, 0, 0, Integer.MAX_VALUE, 0, 0);
+		line(0, 0, 0, Integer.MIN_VALUE, 0, 0);
 		stroke(0, 128, 0);
 		line(0, 0, 0, 0, Integer.MAX_VALUE, 0);
 		stroke(0, 0, 128);
@@ -92,9 +90,24 @@ public class MySketch extends PApplet {
 			Linear c = linears.get(b);
 			HashMap<Double, Double> d = c.getCurvePoints();
 			if (d.size() == 0) {
-				line(0, 0, Integer.MAX_VALUE, 0, 0, Integer.MIN_VALUE);
+				line(0, 0, Integer.MAX_VALUE, 0, 0, 0);
 			} else {
 				Double[] e = d.keySet().toArray(new Double[0]);
+
+				float min_distance = Float.MAX_VALUE;
+				float max_distance = 0.0f;
+				for (int h = 0; h < e.length; h++) {
+					if (e[h] < min_distance) {
+						min_distance = new Float(e[h]);
+					}
+					if (e[h] > max_distance) {
+						max_distance = new Float(e[h]);
+					}
+				}
+				min_distance += Math.min(0.0f, min_distance);
+				//System.out.println("min: " + min_distance);
+				//System.out.println("max: " + max_distance);
+
 				Vector2D h = c.getPosition(e[0]);
 				line(0, 0, Integer.MAX_VALUE, 0, 0, -new Float(Math.max(min_distance, h.y)));
 				Vector2D k = new Vector2D();
@@ -108,7 +121,8 @@ public class MySketch extends PApplet {
 			}
 		}
 
-		/*Vector2D zzz = new Vector2D(0, 10).add(new Vector2D(0, 10).rotate(PI * frameCount / 60));
+		/*Vector2D zzz = new Vector2D(0, 10).add(new Vector2D(0, 10).rotate(PI * frameCount / 3600));
+		System.out.println(180 * frameCount / 3600);
 		line(0, 0, -10, new Float(zzz.x), 0, -new Float(zzz.y));*/
 
 		strokeWeight(3f);
@@ -164,27 +178,10 @@ public class MySketch extends PApplet {
 	}
 
 	public void mapreload() {
-		min_distance = Float.MAX_VALUE;
-		max_distance = 0.0f;
 		linears.clear();
 		if (Client.map != null) {
 			linears.add(Client.map.getOwn_Linear());
-			for (int a = 0; a < linears.size(); a++) {
-				HashMap<Double, Double> b = linears.get(a).getCurvePoints();
-				Double[] c = b.keySet().toArray(new Double[0]);
-				for (int d = 0; d < c.length; d++) {
-					if (c[d] < min_distance) {
-						min_distance = new Float(c[d]);
-					}
-					if (c[d] > max_distance) {
-						max_distance = new Float(c[d]);
-					}
-				}
-			}
+			//TODO 他線の読み込み
 		}
-		min_distance += Math.min(0.0f, min_distance);
-		System.out.println("min: " + min_distance);
-		System.out.println("max: " + max_distance);
 	}
-
 }

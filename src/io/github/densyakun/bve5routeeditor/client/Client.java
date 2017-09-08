@@ -90,6 +90,8 @@ public class Client {
 			map = new RouteMap();
 			mapreload();
 		}
+
+		new RouteEditorWindow().setVisible(true);
 	}
 
 	public static void mapreload() {
